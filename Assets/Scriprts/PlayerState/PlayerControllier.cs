@@ -6,14 +6,14 @@ namespace PlayerState
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour
     {
-        [Header("Movement Settings")]
+        [Header("Настройка передвижения")]
         [SerializeField] private float moveSpeed = 8f;
 
-        [Header("Combat Settings")]
+        [Header("Настройка боя")]
         [SerializeField] private float attackCooldown = 0.5f;
         [SerializeField] private float attackRadius = 3f;
 
-        [Header("References")]
+        [Header("Зона входа в бой")]
         [SerializeField] private Transform attackTriggerZone;
 
         // Компоненты
