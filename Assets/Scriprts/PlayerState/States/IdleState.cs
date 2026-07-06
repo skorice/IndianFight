@@ -21,7 +21,7 @@ namespace PlayerState
         public void UpdateState()
         {
             // Проверка входа в боевую зону
-            if (_player.IsInCombatZone && _player.HasEnemyInRange)
+            if (_player.HasEnemyInRange)
             {
                 _stateMachine.ChangeState(_player.IdleFightState);
                 return;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace PlayerState
 {
@@ -10,12 +11,12 @@ namespace PlayerState
 
         [Header("Combat Settings")]
         [SerializeField] private float attackCooldown = 0.5f;
-        [SerializeField] private float attackRadius = 1.5f;
-        [SerializeField] private LayerMask enemyLayer;
+        [SerializeField] private float attackRadius = 3f;
 
         [Header("References")]
         [SerializeField] private Transform attackTriggerZone;
 
+        // Компоненты
         public Rigidbody2D Body { get; private set; }
         public InputReader Input { get; private set; }
 
@@ -23,9 +24,8 @@ namespace PlayerState
         public float MoveSpeed => moveSpeed;
         public float AttackCooldown => attackCooldown;
         public float AttackRadius => attackRadius;
-        public LayerMask EnemyLayer => enemyLayer;
 
-        public bool IsInCombatZone { get; set; }
+        // Состояния игрока
         public float AttackCooldownTimer { get; set; }
         public Transform CurrentTarget { get; set; }
         public bool HasEnemyInRange { get; set; }
@@ -37,6 +37,7 @@ namespace PlayerState
         public MoveFightState MoveFightState { get; private set; }
 
         private StateMachine _stateMachine;
+        private List<Transform> _enemiesInZone = new List<Transform>();
 
         private void Awake()
         {
@@ -44,7 +45,6 @@ namespace PlayerState
             Input = new InputReader();
             _stateMachine = new StateMachine();
 
-            // Инициализация состояний
             IdleState = new IdleState(this, _stateMachine);
             MoveState = new MoveState(this, _stateMachine);
             IdleFightState = new IdleFightState(this, _stateMachine);
@@ -57,6 +57,17 @@ namespace PlayerState
                 {
                     Debug.LogError("AttackTriggerZone not found!");
                 }
+            }
+
+            if (attackTriggerZone != null)
+            {
+                var collider = attackTriggerZone.GetComponent<CircleCollider2D>();
+                if (collider == null)
+                {
+                    collider = attackTriggerZone.gameObject.AddComponent<CircleCollider2D>();
+                }
+                collider.isTrigger = true;
+                collider.radius = attackRadius;
             }
         }
 
@@ -72,44 +83,51 @@ namespace PlayerState
             if (AttackCooldownTimer > 0)
                 AttackCooldownTimer -= Time.deltaTime;
 
-            UpdateCombatZone();
-            CheckEnemiesInRange();
+            if (attackTriggerZone != null)
+                attackTriggerZone.position = transform.position;
 
             _stateMachine.Tick();
         }
 
-        private void UpdateCombatZone()
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            if (attackTriggerZone == null) return;
-
-            // Триггерная зона всегда следует за игроком
-            attackTriggerZone.position = transform.position;
+            if (other.CompareTag("Enemy") && !_enemiesInZone.Contains(other.transform))
+            {
+                _enemiesInZone.Add(other.transform);
+                UpdateEnemyState();
+            }
         }
 
-        private void CheckEnemiesInRange()
+        private void OnTriggerExit2D(Collider2D other)
         {
-            if (attackTriggerZone == null) return;
+            if (other.CompareTag("Enemy"))
+            {
+                _enemiesInZone.Remove(other.transform);
+                UpdateEnemyState();
+            }
+        }
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(
-                attackTriggerZone.position,
-                attackRadius,
-                enemyLayer
-            );
+        private void UpdateEnemyState()
+        {
+            _enemiesInZone.RemoveAll(t => t == null || !t.gameObject.activeSelf);
 
-            HasEnemyInRange = hits.Length > 0;
+            HasEnemyInRange = _enemiesInZone.Count > 0;
 
             if (HasEnemyInRange)
             {
+                Transform closest = null;
                 float closestDistance = float.MaxValue;
-                foreach (var hit in hits)
+
+                foreach (var enemy in _enemiesInZone)
                 {
-                    float distance = Vector2.Distance(transform.position, hit.transform.position);
+                    float distance = Vector2.Distance(transform.position, enemy.position);
                     if (distance < closestDistance)
                     {
                         closestDistance = distance;
-                        CurrentTarget = hit.transform;
+                        closest = enemy;
                     }
                 }
+                CurrentTarget = closest;
             }
             else
             {
@@ -119,7 +137,8 @@ namespace PlayerState
 
         public void PerformAttack()
         {
-            if (AttackCooldownTimer > 0 || CurrentTarget == null) return;
+            if (AttackCooldownTimer > 0 || CurrentTarget == null)
+                return;
 
             AttackCooldownTimer = attackCooldown;
         }
