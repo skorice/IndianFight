@@ -15,21 +15,19 @@ public class PlayerFight : MonoBehaviour
     private void Awake()
     {
         settings = GetComponent<PlayerSettings>();
+        if (triggerZone == null) triggerZone = transform.Find("TriggerAttackZone");
+        if (attackZone == null) attackZone = transform.Find("RadiusAttack");
     }
 
     private void Update()
     {
         if (cooldown > 0) cooldown -= Time.deltaTime;
 
+        if (triggerZone != null) triggerZone.position = transform.position;
+        if (attackZone != null) attackZone.position = transform.position;
 
-        // На будущее, если моб умрет, мб переделаю потом
-        for (int i = enemiesInZone.Count - 1; i >= 0; i--)
-        {
-            if (enemiesInZone[i] == null || !enemiesInZone[i].gameObject.activeSelf)
-            {
-                enemiesInZone.RemoveAt(i);
-            }
-        }
+        // Очищаем мёртвых врагов
+        enemiesInZone.RemoveAll(e => e == null || !e.gameObject.activeSelf);
 
         if (IsInCombat && cooldown <= 0)
         {
@@ -77,5 +75,22 @@ public class PlayerFight : MonoBehaviour
             enemiesInZone.Remove(other);
         }
     }
-//тут были еще подсвечивающие gizmos для дебага зон , но их путь закончен
+    private void OnDrawGizmosSelected()
+    {
+        var collider = triggerZone.GetComponent<CircleCollider2D>();
+        if (collider != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(triggerZone.position, collider.radius);
+        }
+        
+
+        collider = attackZone.GetComponent<CircleCollider2D>();
+        if (collider != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(attackZone.position, collider.radius);
+        }
+        
+    }
 }
