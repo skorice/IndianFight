@@ -12,7 +12,9 @@ GameObject:
   - component: {fileID: 6099439220393555383}
   - component: {fileID: -8098399227067186036}
   - component: {fileID: -8820594988562440764}
-  - component: {fileID: -2808145603494861237}
+  - component: {fileID: -5647333841067346212}
+  - component: {fileID: 6853545517308506786}
+  - component: {fileID: -7281605340391042987}
   m_Layer: 0
   m_Name: Player
   m_TagString: PlayerTag
@@ -82,7 +84,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.7924528, g: 0, b: 0, a: 1}
@@ -166,8 +168,8 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
---- !u!114 &-2808145603494861237
+  m_Constraints: 4
+--- !u!114 &-5647333841067346212
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,13 +178,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 3524457737142796781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1dcce85623785040b746e66b2a7b773, type: 3}
+  m_Script: {fileID: 11500000, guid: 83e4800313d8bf548b471ae183c62e6a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerState.PlayerController
-  moveSpeed: 8
-  attackCooldown: 0.5
-  attackRadius: 1.5
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  attackTriggerZone: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
+  BASEmoveSpeed: 5
+  BASEattackPower: 1
+  BASEattackSpeed: 0.6
+  BUFFmoveSpead: 0.1
+  BUFFattackPower: 0.5
+  BUFFattackSpeed: 0.05
+  currentLevel: 1
+--- !u!114 &6853545517308506786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3524457737142796781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd8c49c46b549d4aa463e2530473cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMove
+--- !u!114 &-7281605340391042987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3524457737142796781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6352318acd5df1e4b83e922866ca3d6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFight
+  triggerZone: {fileID: 8164509767208896471, guid: c98db57e7a6d80c4d94c646381e7fb9e, type: 3}
+  attackZone: {fileID: 9129713490369550092, guid: a070024eb1c88a847b2d6e248f984553, type: 3}
